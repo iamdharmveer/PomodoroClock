@@ -1,0 +1,88 @@
+.container {
+  display: flex; 
+  flex-direction: column;  
+  align-items:center;
+}
+
+.clock {
+  text-align: center;
+  font-size: 5em;
+  color: blue;
+  line-height: 100%;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;           /* non-prefixed version, currently
+                                  not supported by any browser */
+}
+
+.ten-min, .ten-sec {
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.one-min {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.one-sec { 
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.title {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 30px;
+}
+
+#buttoncontainer {
+  text-align: center;  
+}
+
+#the-button, #reset-button {
+  font-size: 2em;
+  color: blue;
+  border-radius: 10px
+}
+
+#auto-adv {
+  margin-left: 10px;
+  font-size: 1.5em;
+  color: blue;  
+}
+
+.colon {
+  padding-bottom: 10px;
+}
+
+.dr {
+  display: flex; 
+  flex-direction: row;  
+}
+
+.dc {
+  display: flex; 
+  flex-direction: column;
+  width: 60px;
+}
+
+button.down {
+  border-radius: 5px;
+  background-color: grey;
+  display:block;
+}
+
+button.up  {
+  border-radius: 5px;
+  background-color: grey;
+  display:block;
+}
+
+hr {
+  margin: 10px 0 10px 0;
+}
+
