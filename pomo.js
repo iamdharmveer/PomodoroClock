@@ -1,315 +1,147 @@
-function Clock(elem, id, duration, cb) {
+'use strict';
 
-  var tick;
-  this.clockId = id;
-  this.duration = duration * 60;
-  this.countDown = 0;
-  this.state = "stopped";
-  this.parent = elem;
-  this.ticklength = tick || 1000
-  this.expireCallback = cb;
+window.cancelRequestAnimFrame = ( function() {
+    return window.cancelAnimationFrame          ||
+        window.webkitCancelRequestAnimationFrame    ||
+        window.mozCancelRequestAnimationFrame       ||
+        window.oCancelRequestAnimationFrame     ||
+        window.msCancelRequestAnimationFrame        ||
+        clearTimeout
+} )();
 
-  // console.log(elem);
+window.requestAnimFrame = (function(){
+    return  window.requestAnimationFrame       ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame    ||
+        window.oRequestAnimationFrame      ||
+        window.msRequestAnimationFrame     ||
+        function(/* function */ callback, /* DOMElement */ element){
+            return window.setTimeout(callback, 1000 / 60);
+        };
+})();
 
-  elem.html(
-    '<div class="dr" data-clock="' + elem.attr('id') + '">' +
-    '<div class="dc">' +
-    '<button id="hour-btn-up-' + id + '"  class="up" data-mult="3600" data-adj="1" data-min="0" data-max="9"><i class="fa fa-arrow-up"></i></button>' +
-    '<span id="hour-' + id + '"></span>' +
-    '<button id="hour-btn-down-' + id + '" class="down" data-mult="3600" data-adj="-1" data-min="0" data-max="9"><i class="fa fa-arrow-down"></i></button>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<span id="hour-colon" class="colon">:</span>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<button id="ten-min-btn-up-' + id + '" class="up" data-mult="600" data-adj="1" data-min="0" data-max="5"><i class="fa fa-arrow-up"></i></button>' +
-    '<span id="ten-min-' + id + '"></span>' +
-    '<button id="ten-min-btn-down-' + id + '" class="down" data-mult="600" data-adj="-1" data-min="0" data-max="5"><i class="fa fa-arrow-down"></i></button>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<button id="one-min-btn-up-' + id + '" class="up" data-mult="60" data-adj="1" data-min="0" data-max="9"><i class="fa fa-arrow-up"></i></button>' +
-    '<span id="one-min-' + id + '"></span>' +
-    '<button id="one-min-btn-down-' + id + '" class="down" data-mult="60" data-adj="-1" data-min="0" data-max="9"><i class="fa fa-arrow-down"></i></button>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<span class="colon">:</span>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<button id="ten-sec-btn-up-' + id + '" class="up" data-mult="10" data-adj="1" data-min="0" data-max="5"><i class="fa fa-arrow-up"></i></button>' +
-    '<span id="ten-sec-' + id + '"></span>' +
-    '<button id="ten-sec-btn-down-' + id + '" class="down" data-mult="10" data-adj="-1" data-min="0" data-max="5"><i class="fa fa-arrow-down"></i></button>' +
-    '</div>' +
-    '<div class="dc">' +
-    '<button id="one-sec-btn-up-' + id + '" class="up" data-mult="1" data-adj="1" data-min="0" data-max="9"><i class="fa fa-arrow-up"></i></button>' +
-    '<span id="one-sec-' + id + '" class="one-sec"></span>' +
-    '<button id="one-sec-btn-down-' + id + '" class="down" data-mult="1" data-adj="-1" data-min="0" data-max="9"><i class="fa fa-arrow-down"></i></button>' +
-    '</div>' +
-    '</div><hr>');
+window.mobileAndTabletcheck = function() {
+  var check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4)))check = true})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+}
 
-  $("#hour-btn-up-" + id).click(this.arrowClick);
-  $("#hour-btn-down-" + id).click(this.arrowClick);
-  $("#ten-min-btn-up-" + id).click(this.arrowClick);
-  $("#ten-min-btn-down-" + id).click(this.arrowClick);
-  $("#one-min-btn-up-" + id).click(this.arrowClick);
-  $("#one-min-btn-down-" + id).click(this.arrowClick);
-  $("#ten-sec-btn-up-" + id).click(this.arrowClick);
-  $("#ten-sec-btn-down-" + id).click(this.arrowClick);
-  $("#one-sec-btn-up-" + id).click(this.arrowClick);
-  $("#one-sec-btn-down-" + id).click(this.arrowClick);
+document.addEventListener('DOMContentLoaded', () => {
+  let anim = null;
 
-  this.setClock(elem.attr('id'), this);
+  let isRunning = false;
 
-  this.display();
+  let startTime = null;
+  let pausedTime = 0;
+  let elapsedTime = 0;
 
-  return this;
-};
+  const clockEl = document.querySelector('.clock');
+  const pointerEl = clockEl.querySelector('.clock__pointer');
+  const svgEl = clockEl.querySelector('svg');
+  const svgEllipse = svgEl.querySelector('ellipse');
+  const timePlaceholderEl = document.querySelector('.clock-time');
+  const resetBtnEl = document.querySelector('.clock-button[data-role="clock-reset"]');
+  const startBtnEl = document.querySelector('.clock-button[data-role="clock-start-stop"]');
+  const startBtnTextEl = startBtnEl.querySelector('.clock-button__text');
 
-Clock.clocks = {};
+  const maxDashoffset = -90;
 
-Clock.prototype = {
+  // put the left 0 if < 10
+  const getFullValue = (val) => {
+    return (val < 10) ? '0' + val : val;
+  };
 
-  setClock: function setClock(id, clock) {
-    Clock.clocks[id] = clock;
-  },
+  const getFullMils = (val) => {
+    if (val < 10) return '00' + val;
+    if (val < 100) return '0' + val;
 
-  display: function display() {
-    var curr = this.countDown;
-    var time = Math.floor(curr / 3600);
-    $("#hour-" + this.clockId).text("" + time);
-    curr = curr - time * 3600;
-    time = Math.floor(curr / 600);
-    $("#ten-min-" + this.clockId).text("" + time);
-    curr = curr - time * 600;
-    time = Math.floor(curr / 60);
-    $("#one-min-" + this.clockId).text("" + time);
-    curr = curr - time * 60;
-    time = Math.floor(curr / 10);
-    $("#ten-sec-" + this.clockId).text("" + time);
-    time = curr - time * 10;
-    $("#one-sec-" + this.clockId).text("" + time);
-  },
-
-  reset: function reset() {
-    this.countDown = this.duration;
-    this.state = "reset";
-    this.display();
-
-    $("#hour-btn-up-" + this.clockId).show();
-    $("#hour-btn-down-" + this.clockId).show();
-    $("#ten-min-btn-up-" + this.clockId).show();
-    $("#ten-min-btn-down-" + this.clockId).show();
-    $("#one-min-btn-up-" + this.clockId).show();
-    $("#one-min-btn-down-" + this.clockId).show();
-    $("#ten-sec-btn-up-" + this.clockId).show();
-    $("#ten-sec-btn-down-" + this.clockId).show();
-    $("#one-sec-btn-up-" + this.clockId).show();
-    $("#one-sec-btn-down-" + this.clockId).show();
-  },
-
-  ready: function ready() {
-    $("#hour-btn-up-" + this.clockId).hide();
-    $("#hour-btn-down-" + this.clockId).hide();
-    $("#ten-min-btn-up-" + this.clockId).hide();
-    $("#ten-min-btn-down-" + this.clockId).hide();
-    $("#one-min-btn-up-" + this.clockId).hide();
-    $("#one-min-btn-down-" + this.clockId).hide();
-    $("#ten-sec-btn-up-" + this.clockId).hide();
-    $("#ten-sec-btn-down-" + this.clockId).hide();
-    $("#one-sec-btn-up-" + this.clockId).hide();
-    $("#one-sec-btn-down-" + this.clockId).hide();
-
-  },
-
-  resetCountdown: function resetCountdown() {
-    this.countDown = this.duration;
-    this.display();
-  },
-
-  start: function start() {
-    if (this.state === "reset") {
-      this.countDown = this.duration;
-      if (this.countDown == 0) this.countDown = 1;
-    }
-
-    this.ready();
-
-    if (this.countDown > 0) {
-      this.state = "running";
-      setTimeout(this.tick.bind(this), this.ticklength);
-    }
-  },
-
-  pause: function stop() {
-    this.state = "paused";
-  },
-
-  tick: function tick() {
-    if (this.state !== "running") return;
-    // console.log("count: " + this.countDown);
-    this.countDown--;
-    if (this.countDown > 0) {
-      this.display();
-      var that = this;
-      setTimeout(this.tick.bind(this), this.ticklength);
-    } else {
-      this.countDown = 0;
-      this.display();
-      this.timerFinished();
-    }
-  },
-
-  blink: function blink(elem, duration, count, colora, colorb) {
-    elem.css("color", colora);
-    if (count > 0) {
-      setTimeout(this.blink.bind(this), duration, elem, duration, --count, colorb, colora);
-    } else if (this.expireCallback && !(this.state === "reset")) {
-      this.state = "reset"
-      this.expireCallback();
-    }
-  },
-
-  timerFinished: function timerFinished() {
-    this.blink(this.parent, 500, 5, "red", "blue");
-  },
-
-  setDuration: function setDuration(duration) {
-    this.duration = duration;
-    this.reset();
-  },
-
-  getDuration: function getDuration() {
-    return this.duration;
-  },
-
-  adjust: function adjust(val) {
-    this.duration += val;
-    this.countDown = this.duration;
-  },
-
-  arrowClick: function arrowClick(evt) {
-    var thisClock = Clock.clocks[$(this).parent().parent().data("clock")];
-    var currVal = +$($(this).parent().children()[1]).text();
-    var adj = +$(this).data("adj");
-    var min = +$(this).data("min");
-    var max = +$(this).data("max");
-
-    currVal += adj;
-    if ((currVal >= min) && (currVal <= max)) {
-      thisClock.adjust(adj * (+$(this).data("mult")));
-      thisClock.display();
-    }
+    return val;
   }
 
-};
+  const startCounter = (timestamp) => {
+    if (!startTime) startTime = timestamp;
 
-$("document").ready(function() {
-  var currentClock;
-  var aClock;
-  var cycle = 1;
+    if (isRunning) {
+      elapsedTime = (timestamp - startTime) - pausedTime;
 
-  var cClock = new Clock($("#theclock-c"), "c", 15, function() {
-    cycle = 1;
-    $("#work-span").text("Cycle: " + cycle);
-    $("#rest-span").text("Cycle: " + cycle);
-    $("#recharge-clock").slideUp("slow", function() {
-      $("#work-clock").slideDown("slow", function() {
-        currentClock = aClock;
-        if ($('#auto-adv-chk').prop('checked')) {
-          currentClock.start();
-        } else {
-          $("#the-button").text("Continue");
-          currentClock.resetCountdown();
+      let dat = new Date(elapsedTime);
+      let mins = dat.getMinutes();
+      let secs = dat.getSeconds();
+      let mils = dat.getMilliseconds();
+
+      let angleBetweenSecs = 360 / 60;
+      let angle = (360 * mins) + (angleBetweenSecs * secs) + ((angleBetweenSecs / 1000) * mils);
+
+      mins = getFullValue(mins);
+      secs = getFullValue(secs);
+      mils = getFullMils(mils);
+
+      pointerEl.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
+      timePlaceholderEl.innerHTML = `${mins}:${secs},${mils}`;
+
+      // only if not mobile (poor performance)
+      if (!window.mobileAndTabletcheck()) {
+        let svgAngle = -90 + angle;
+        let dashoffsetPerAngle = 1.5;
+        svgEl.style.transform = `translate(-50%, -50%) rotate(${svgAngle}deg)`;
+
+        let newOffset = -135 + (angle * 0.75 / 2);
+        if (newOffset <= maxDashoffset) {
+          svgEllipse.style.strokeDashoffset = newOffset + '%';
         }
-      });
-    });
-  });
-  cClock.reset();
-
-  var bClock = new Clock($("#theclock-b"), "b", 5, function() {
-    $("#rest-clock").slideUp("slow", function() {
-      cycle++;
-      $("#work-span").text("Cycle: " + cycle);
-      $("#rest-span").text("Cycle: " + cycle);
-      if (cycle == 4) {
-        $("#recharge-clock").slideDown("slow", function() {
-          currentClock = cClock;
-          if ($('#auto-adv-chk').prop('checked')) {
-            currentClock.start();
-          } else {
-            $("#the-button").text("Continue");
-            currentClock.resetCountdown();
-          }
-        });
-      } else {
-        $("#work-clock").slideDown("slow", function() {
-          currentClock = aClock;
-          if ($('#auto-adv-chk').prop('checked')) {
-            currentClock.start();
-          } else {
-            $("#the-button").text("Continue");
-            currentClock.resetCountdown();
-          }
-        });
       }
-    });
-  });
-  bClock.reset();
 
-  aClock = new Clock($("#theclock-a"), "a", 25, function() {
-    $("#work-clock").slideUp("slow", function() {
-      $("#rest-clock").slideDown("slow", function() {
-        currentClock = bClock;
-        if ($('#auto-adv-chk').prop('checked')) {
-          currentClock.start();
-        } else {
-          $("#the-button").text("Continue");
-          currentClock.resetCountdown();
-        }
-      });
-    });
-  });
-  aClock.reset();
+    } else {
+      pausedTime = (timestamp - startTime) - elapsedTime;
 
-  $("#the-button").text("Start");
-
-  $("#reset-button").click(function() {
-    $("#the-button").text("Start");
-    $("#work-clock").slideDown("fast");
-    $("#rest-clock").slideDown("fast");
-    $("#recharge-clock").slideDown("fast");
-    aClock.reset();
-    bClock.reset();
-    cClock.reset();
-    $("#work-span").text("");
-    $("#rest-span").text("");
-    $("#recharge-span").text("");
-  });
-
-  $("#the-button").click(function() {
-    if ($(this).text() == "Start") {
-      cycle = 1;
-      aClock.ready();
-      bClock.ready();
-      cClock.ready();
-      setTimeout(function() {
-        $("#recharge-clock").slideUp("slow", function() {
-          $("#rest-clock").slideUp("slow", function() {
-            aClock.start();
-            currentClock = aClock;
-            $("#the-button").text("Pause");
-            $("#work-span").text("Cycle: " + cycle);
-            $("#rest-span").text("Cycle: " + cycle);
-            $("#recharge-span").text("Cycle: " + cycle);
-          });
-        });
-      }, 500);
-    } else if ($(this).text() == "Pause") {
-      currentClock.pause();
-      $(this).text("Run");
-    } else if (($(this).text() == "Run") ||
-      ($(this).text() == "Continue")) {
-      currentClock.start();
-      $(this).text("Pause");
     }
+
+    anim = window.requestAnimFrame(startCounter);
+  };
+
+  // reset all flags and values
+  resetBtnEl.addEventListener('click', () => {
+    isRunning = false;
+    startTime = null;
+    pausedTime = 0;
+    elapsedTime = 0;
+
+    startBtnEl.classList.remove('clock-button--pause');
+    startBtnTextEl.innerHTML = 'Start';
+
+    pointerEl.style.transform = `translate(-50%, -100%) rotate(0)`;
+    timePlaceholderEl.innerHTML = `00:00,000`;
+
+    clockEl.classList.remove('clock--started');
+
+    svgEl.style.transform = '';
+    svgEllipse.style.strokeDashoffset = '';
+
+    window.cancelRequestAnimFrame(anim);
   });
-})
+
+  // start and stop click event
+  startBtnEl.addEventListener('click', () => {
+    // if not running
+    if (!isRunning) {
+      isRunning = true;
+
+      anim = window.requestAnimFrame(startCounter);
+
+      clockEl.classList.add('clock--started');
+
+      startBtnEl.classList.add('clock-button--pause');
+      startBtnTextEl.innerHTML = 'Pause';
+    } else {
+      isRunning = false;
+
+      clockEl.classList.remove('clock--started');
+
+      startBtnEl.classList.remove('clock-button--pause');
+      startBtnTextEl.innerHTML = 'Continue';
+
+    }
+
+  });
+});
+
